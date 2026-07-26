@@ -32,11 +32,11 @@ description = "Public SPLENT marketplace catalog: browse features, their contrac
 archetype = "light"
 
 [tool.splent.contract.provides]
-routes     = ["/", "/marketplace", "/marketplace/<short>", "/marketplace/spls"]
+routes     = ["/", "/marketplace", "/marketplace/<short>", "/marketplace/publish", "/marketplace/spls"]
 blueprints = []
 models     = []
 commands   = []
-hooks      = ["layout.sidebar.top"]
+hooks      = []
 services   = ["MarketplaceService"]
 signals    = []
 translations = []
@@ -44,12 +44,13 @@ docker     = []
 
 [tool.splent.contract.requires]
 features = []
+features_optional = ["elasticsearch"]
 env_vars = ["SPLENT_INDEX_URL", "WORKING_DIR"]
 signals  = []
 
 [tool.splent.contract.extensible]
 services  = ["MarketplaceService"]
-templates = ["marketplace/detail.html", "marketplace/index.html", "marketplace/spls.html"]
+templates = ["marketplace/detail.html", "marketplace/index.html", "marketplace/publish.html", "marketplace/spls.html"]
 models    = []
-hooks     = ["layout.sidebar.top"]
+hooks     = []
 routes    = false

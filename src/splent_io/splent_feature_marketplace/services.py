@@ -27,6 +27,7 @@ from flask import current_app, has_app_context
 DEFAULT_INDEX_URL = "https://splent-io.github.io/splent_index/index.json"
 CACHE_TTL_SECONDS = 300
 FETCH_TIMEOUT_SECONDS = 10
+INDEX_SCHEMA = 1
 
 EMPTY_INDEX = {"features": [], "spls": [], "collisions": []}
 
@@ -58,6 +59,50 @@ class MarketplaceService:
         with open(self._local_cache_path(), encoding="utf-8") as fh:
             return json.load(fh)
 
+    @staticmethod
+    def _is_index(data):
+        """True when *data* has the shape of a marketplace index document.
+
+        Both sources are untrusted JSON (a remote URL, an editable local
+        cache): a parseable document with the wrong shape must be treated
+        exactly like a missing one, or every catalog page 500s for the whole
+        TTL. Same contract as the configurator's ``_is_index``.
+        """
+        if not isinstance(data, dict) or data.get("schema") != INDEX_SCHEMA:
+            return False
+        return all(
+            isinstance(data.get(key) or [], list)
+            for key in ("features", "spls", "collisions")
+        )
+
+    @staticmethod
+    def _normalize_index(index):
+        """Drop non-dict list entries and default missing feature keys.
+
+        A partially corrupt entry (``collisions: ["bad"]``) or a feature
+        without ``provides``/``requires`` must degrade to an incomplete card,
+        never to a 500 in the templates.
+        """
+        for key in ("features", "spls", "collisions"):
+            index[key] = [
+                entry for entry in (index.get(key) or []) if isinstance(entry, dict)
+            ]
+        for feature in index["features"]:
+            feature["provides"] = (
+                feature.get("provides")
+                if isinstance(feature.get("provides"), dict)
+                else {}
+            )
+            feature["requires"] = (
+                feature.get("requires")
+                if isinstance(feature.get("requires"), dict)
+                else {}
+            )
+            for list_key in ("tags", "used_by"):
+                if not isinstance(feature.get(list_key), list):
+                    feature[list_key] = []
+        return index
+
     def _load_index(self, force=False):
         """Return the index dict, honouring the TTL cache and fallbacks."""
         now = time.time()
@@ -68,18 +113,28 @@ class MarketplaceService:
         ):
             return _cache["index"]
 
+        # A local workspace cache means a development checkout: the freshly
+        # built index there is the truth (it may include SPLs/features not
+        # published yet). Production containers have no workspace cache and
+        # read the published index. A malformed local copy (unparseable OR
+        # wrong shape) falls through to the remote index.
         try:
-            index = self._fetch_remote()
-        except Exception:
+            index = self._read_local()
+            if not self._is_index(index):
+                raise ValueError("malformed local marketplace index")
+        except (OSError, ValueError):
             try:
-                index = self._read_local()
-            except (OSError, ValueError):
-                # No network and no local copy: keep serving the stale
-                # in-memory index if we ever had one.
+                index = self._fetch_remote()
+                if not self._is_index(index):
+                    raise ValueError("malformed remote marketplace index")
+            except Exception:
+                # No valid local copy and no valid remote: keep serving the
+                # stale in-memory index if we ever had one.
                 if _cache["index"] is not None:
                     return _cache["index"]
                 return EMPTY_INDEX
 
+        index = self._normalize_index(index)
         _cache["index"] = index
         _cache["fetched_at"] = now
         return index
@@ -102,6 +157,79 @@ class MarketplaceService:
                 return feature
         return None
 
+
+    # ── optional Elasticsearch (soft dependency) ─────────────────────────
+
+    ES_INDEX_NAME = "marketplace_features"
+
+    def _es_service(self):
+        """The ElasticsearchService when installed and reachable, else None.
+
+        Soft dependency: the catalog searches in memory without it and
+        transparently upgrades to full-text search when the elasticsearch
+        feature is part of the product.
+        """
+        try:
+            from splent_framework.services.service_locator import service_proxy
+
+            svc = service_proxy("ElasticsearchService")
+            return svc if svc.available() else None
+        except Exception:
+            return None
+
+    def _es_ensure_indexed(self, es, index_doc):
+        """Index the catalog once per index generation (cheap: ~30 docs)."""
+        generation = index_doc.get("generated_at") or ""
+        if _cache.get("es_indexed_for") == generation:
+            return
+        es.ensure_index(self.ES_INDEX_NAME)
+        for f in index_doc.get("features") or []:
+            es.index_document(
+                self.ES_INDEX_NAME,
+                f["short"],
+                {
+                    "short": f.get("short"),
+                    "repo": f.get("repo"),
+                    "description": f.get("description"),
+                    "tags": f.get("tags") or [],
+                    "archetype": f.get("archetype"),
+                    "category": f.get("category"),
+                },
+            )
+        # Elasticsearch is near-real-time: without an explicit refresh the
+        # documents just indexed are invisible to the search that follows in
+        # this same request (a fresh index would answer "no results" for ~1s).
+        # ~30 docs, so the refresh is cheap. getattr keeps older
+        # ElasticsearchService versions (without refresh_index) working.
+        refresh = getattr(es, "refresh_index", None)
+        if callable(refresh):
+            refresh(self.ES_INDEX_NAME)
+        _cache["es_indexed_for"] = generation
+
+    def _es_search_shorts(self, query):
+        """Ranked shorts for a free-text query, or None to use the fallback."""
+        es = self._es_service()
+        if es is None:
+            return None
+        try:
+            self._es_ensure_indexed(es, self._load_index())
+            result = es.search(
+                self.ES_INDEX_NAME,
+                {
+                    "query": {
+                        "multi_match": {
+                            "query": query,
+                            "fields": ["short^3", "repo^2", "tags^2", "description"],
+                            "fuzziness": "AUTO",
+                        }
+                    },
+                    "size": 100,
+                },
+            )
+            return [h["_source"]["short"] for h in result.get("hits", [])]
+        except Exception:
+            return None
+
     def search(self, query=None, category=None, archetype=None):
         """Features filtered by free-text query, category and/or archetype.
 
@@ -114,6 +242,10 @@ class MarketplaceService:
         if category:
             results = [f for f in results if f.get("category") == category]
         if query:
+            ranked = self._es_search_shorts(query.strip())
+            if ranked is not None:
+                by_short = {f["short"]: f for f in results}
+                return [by_short[s] for s in ranked if s in by_short]
             needle = query.strip().lower()
             results = [
                 f

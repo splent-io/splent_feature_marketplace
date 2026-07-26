@@ -1,68 +1,88 @@
-{% extends "base_template.html" %}
+{% extends "public_base.html" %}
 {% import "marketplace/_macros.html" as mk %}
 
 {% block title %}{{ _("Product lines") }} — {{ _("Marketplace") }}{% endblock %}
 
-{% block head %}{% include "marketplace/_styles.html" %}{% endblock %}
-
-{% block breadcrumb %}
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url_for('marketplace.index') }}">{{ _("Marketplace") }}</a></li>
-        <li class="breadcrumb-item active" aria-current="page">{{ _("Product lines") }}</li>
-    </ol>
-</nav>
+{% block hero %}
+<section class="store-hero store-hero--slim">
+    <div class="container">
+        <h1 class="store-hero__title">{{ _("Product lines") }}</h1>
+        <p class="store-hero__subtitle">{{ _("Each line is a Software Product Line: a variability model over marketplace features. Pick one and configure your own product.") }}</p>
+    </div>
+</section>
 {% endblock %}
 
 {% block content %}
-<div class="mk-header">
-    <h1 class="h3 mb-1">{{ _("Product lines") }}</h1>
-    <p class="text-muted mb-0">{{ _("Software Product Lines built from marketplace features.") }}</p>
+<div class="container">
+    {% if spls %}
+    <div class="store-spl-list">
+        {% for spl in spls %}
+        <article class="store-spl-row">
+            <header class="store-spl-row__head">
+                <div class="store-spl-row__title">
+                    {{ mk.icon("layers", 22) }}
+                    <div>
+                        <h2 class="store-spl-row__name">{{ spl.name }}</h2>
+                        {% if spl.description %}<p class="store-spl-row__desc">{{ spl.description }}</p>{% endif %}
+                    </div>
+                </div>
+                {% if spl.configure_url %}
+                <a class="btn btn-primary store-spl-row__cta" href="{{ spl.configure_url }}">
+                    {{ mk.icon("sliders") }}{{ _("Configure this line") }}
+                </a>
+                {% endif %}
+            </header>
+
+            {% if spl.mandatory %}
+            <details class="store-fold">
+                <summary class="store-fold__summary">
+                    {{ mk.icon("check-circle") }}
+                    <span class="store-fold__label store-fold__label--mandatory">{{ _("Always included") }}</span>
+                    <span class="store-fold__count">{{ spl.mandatory | length }}</span>
+                    {{ mk.icon("chevron-down") }}
+                </summary>
+                <div class="store-fold__body store-chipset">
+                    {% for entry in spl.mandatory %}{{ mk.feature_chip(entry.short, external=entry.external) }}{% endfor %}
+                </div>
+            </details>
+            {% endif %}
+
+            {% for group_name, group in spl.groups.items() %}
+            <details class="store-fold">
+                <summary class="store-fold__summary">
+                    {{ mk.icon("git-branch") }}
+                    <span class="store-fold__label store-fold__label--alt">{{ group_name }}</span>
+                    <span class="store-fold__hint">{% if group.kind == "alternative" %}{{ _("choose exactly one") }}{% else %}{{ group.kind }}{% endif %}</span>
+                    <span class="store-fold__count">{{ group.options | length }}</span>
+                    {{ mk.icon("chevron-down") }}
+                </summary>
+                <div class="store-fold__body store-chipset">
+                    {% for entry in group.options %}{{ mk.feature_chip(entry.short, external=entry.external) }}{% endfor %}
+                </div>
+            </details>
+            {% endfor %}
+
+            {% if spl.optional %}
+            <details class="store-fold">
+                <summary class="store-fold__summary">
+                    {{ mk.icon("plus") }}
+                    <span class="store-fold__label">{{ _("Optional") }}</span>
+                    <span class="store-fold__count">{{ spl.optional | length }}</span>
+                    {{ mk.icon("chevron-down") }}
+                </summary>
+                <div class="store-fold__body store-chipset">
+                    {% for entry in spl.optional %}{{ mk.feature_chip(entry.short, external=entry.external) }}{% endfor %}
+                </div>
+            </details>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="store-empty">
+        {{ mk.icon("layers", 34) }}
+        <p>{{ _("No product lines in the index yet.") }}</p>
+    </div>
+    {% endif %}
 </div>
-
-{% if spls %}
-{% for spl in spls %}
-<section class="mk-spl">
-    <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
-        <h2 class="h4 mb-0">{{ spl.name }}</h2>
-        {% if spl.uvl.file %}<code class="mk-code">{{ spl.uvl.file }}</code>{% endif %}
-    </div>
-    {% if spl.description %}<p class="text-muted">{{ spl.description }}</p>{% endif %}
-
-    {% if spl.mandatory %}
-    <h3 class="mk-section-title">{{ _("Mandatory") }}</h3>
-    <div>
-        {% for entry in spl.mandatory %}{{ mk.feature_chip(entry.short) }}{% endfor %}
-    </div>
-    {% endif %}
-
-    {% if spl.groups %}
-    <h3 class="mk-section-title">{{ _("Alternative groups") }}</h3>
-    {% for group_name, group in spl.groups.items() %}
-    <div class="mk-group">
-        <div class="mk-group-name">
-            {{ group_name }}
-            <span class="mk-group-kind">
-                {% if group.kind == "alternative" %}{{ _("choose exactly one") }}{% else %}{{ group.kind }}{% endif %}
-            </span>
-        </div>
-        {% for entry in group.options %}{{ mk.feature_chip(entry.short) }}{% endfor %}
-    </div>
-    {% endfor %}
-    {% endif %}
-
-    {% if spl.optional %}
-    <h3 class="mk-section-title">{{ _("Optional") }}</h3>
-    <div>
-        {% for entry in spl.optional %}{{ mk.feature_chip(entry.short) }}{% endfor %}
-    </div>
-    {% endif %}
-</section>
-{% endfor %}
-{% else %}
-<div class="mk-empty">
-    <i data-feather="layers"></i>
-    <p class="mb-0">{{ _("No product lines in the index yet.") }}</p>
-</div>
-{% endif %}
 {% endblock %}

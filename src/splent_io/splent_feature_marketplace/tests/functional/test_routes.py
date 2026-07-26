@@ -80,6 +80,31 @@ def test_detail_unknown_short_returns_404(test_client, stub_index):
     assert response.status_code == 404
 
 
+def test_detail_tolerates_feature_without_contract_keys(
+    test_client, sample_index, monkeypatch
+):
+    """An index entry without provides/requires/tags/used_by (the index is
+    remote, unvalidated JSON) must render a degraded sheet, never a 500."""
+    import splent_io.splent_feature_marketplace.services as services
+
+    events = sample_index["features"][0]
+    for key in ("provides", "requires", "tags", "used_by"):
+        events.pop(key, None)
+    # Serve through the real _load_index so normalization kicks in.
+    monkeypatch.setattr(
+        services.MarketplaceService, "_read_local", lambda self: sample_index
+    )
+
+    response = test_client.get("/marketplace/events")
+    assert response.status_code == 200
+    html = _html(response)
+    assert "This feature declares no public contract surface." in html
+    assert "No hard dependencies." in html
+
+    # The grid also renders fine with the degraded entry.
+    assert test_client.get("/marketplace").status_code == 200
+
+
 # ── GET /marketplace/spls ─────────────────────────────────────────────────
 
 
@@ -88,9 +113,41 @@ def test_spls_page_shows_groups_and_features(test_client, stub_index):
     assert response.status_code == 200
     html = _html(response)
     assert "cms_spl" in html
-    assert "cms_spl.uvl" in html
-    # Mandatory, optional and the alternative "session" group.
+    # Collapsible blocks with counts replaced the uvl filename badge.
+    assert "store-fold" in html
+    assert "Always included" in html
+    # Features published in the index link to their detail page.
     assert 'href="/marketplace/theme"' in html
     assert 'href="/marketplace/events"' in html
-    assert 'href="/marketplace/session_filesystem"' in html
-    assert 'href="/marketplace/session_redis"' in html
+    # Model features absent from the index (only referenced by the SPL, e.g.
+    # published on GitHub/PyPI but not indexed) render as unlinked chips
+    # marked "external" instead of pointing to a 404.
+    assert 'href="/marketplace/session_filesystem"' not in html
+    assert 'href="/marketplace/session_redis"' not in html
+    assert "session_filesystem" in html
+    assert "session_redis" in html
+    assert "store-chip-link--external" in html
+
+
+# ── GET /marketplace/publish ──────────────────────────────────────────────
+
+
+def test_publish_page_explains_the_release_and_registry_flow(
+    test_client, stub_index
+):
+    response = test_client.get("/marketplace/publish")
+    assert response.status_code == 200
+    html = _html(response)
+    assert "Publish your feature" in html
+    # The three mechanics: release command, registry PR, no upload API.
+    assert "splent feature:release" in html
+    assert "splent-io/splent_index" in html
+    assert "https://docs.splent.io/marketplace/publishing" in html
+
+
+def test_publish_is_not_swallowed_by_the_detail_route(test_client, stub_index):
+    # /marketplace/<short> would 404 on an unknown short; the static rule
+    # must win over the converter rule for "publish".
+    response = test_client.get("/marketplace/publish")
+    assert response.status_code == 200
+    assert "Publish your feature" in _html(response)

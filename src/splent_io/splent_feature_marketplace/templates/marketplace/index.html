@@ -1,80 +1,97 @@
-{% extends "base_template.html" %}
+{% extends "public_base.html" %}
 {% import "marketplace/_macros.html" as mk %}
 
-{% block title %}{{ _("Marketplace") }}{% endblock %}
+{% block title %}{{ _("Marketplace") }} — {{ site.name }}{% endblock %}
 
-{% block head %}{% include "marketplace/_styles.html" %}{% endblock %}
+{% block hero %}
+<section class="store-hero">
+    <div class="container">
+        <h1 class="store-hero__title">{{ _("The SPLENT feature marketplace") }}</h1>
+        <p class="store-hero__subtitle">{{ _("Reusable, contract-verified features you can install into any SPLENT product with one command.") }}</p>
+        <form class="store-search" method="get" action="{{ url_for('marketplace.index') }}" role="search">
+            {% if archetype %}<input type="hidden" name="archetype" value="{{ archetype }}">{% endif %}
+            {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+            <input class="store-search__input" type="search" name="q" value="{{ query }}"
+                   placeholder="{{ _('Search features — name, description or tag') }}"
+                   aria-label="{{ _('Search features') }}" autocomplete="off">
+            <button class="store-search__btn" type="submit">{{ mk.icon("search", 18) }}{{ _("Search") }}</button>
+        </form>
+        <p class="store-hero__stats">
+            <span><strong>{{ total_features }}</strong> {{ _("features") }}</span>
+            <span class="store-dot" aria-hidden="true">·</span>
+            <a href="{{ url_for('marketplace.spls') }}" style="color:inherit"><strong>{{ total_spls }}</strong> {{ _("product lines") }}</a>
+        </p>
+    </div>
+</section>
+{% endblock %}
 
 {% block content %}
-<div class="mk-header d-flex justify-content-between align-items-start flex-wrap gap-2">
-    <div>
-        <h1 class="h3 mb-1">{{ _("Marketplace") }}</h1>
-        <p class="text-muted mb-0">{{ _("Reusable SPLENT features you can install into your products.") }}</p>
-    </div>
-    <a class="btn btn-outline-primary" href="{{ url_for('marketplace.spls') }}">
-        <i class="align-middle" data-feather="layers"></i>
-        <span class="align-middle">{{ _("Product lines") }}</span>
-    </a>
-</div>
-
-<form class="row g-2 align-items-end mk-filters" method="get" action="{{ url_for('marketplace.index') }}">
-    <div class="col-12 col-md-5">
-        <label class="form-label" for="mk-q">{{ _("Search") }}</label>
-        <input class="form-control" type="search" id="mk-q" name="q" value="{{ query }}"
-               placeholder="{{ _('Name, description or tag') }}">
-    </div>
-    <div class="col-6 col-md-3">
-        <label class="form-label" for="mk-archetype">{{ _("Archetype") }}</label>
-        <select class="form-select" id="mk-archetype" name="archetype">
-            <option value="">{{ _("All archetypes") }}</option>
-            {% for a in archetypes %}
-            <option value="{{ a }}" {% if a == archetype %}selected{% endif %}>{{ a }}</option>
-            {% endfor %}
-        </select>
+<div class="container store-toolbar">
+    <div class="store-chiprow">
+        <span class="store-chiprow__label">{{ _("Archetype") }}</span>
+        <a class="store-chip {{ 'is-active' if not archetype }}"
+           href="{{ url_for('marketplace.index', q=query or None, category=category) }}">{{ _("All") }}</a>
+        {% for a in archetypes %}
+        <a class="store-chip {{ 'is-active' if a == archetype }}"
+           href="{{ url_for('marketplace.index', q=query or None, archetype=a, category=category) }}">{{ a }}</a>
+        {% endfor %}
     </div>
     {% if categories %}
-    <div class="col-6 col-md-2">
-        <label class="form-label" for="mk-category">{{ _("Category") }}</label>
-        <select class="form-select" id="mk-category" name="category">
-            <option value="">{{ _("All categories") }}</option>
-            {% for c in categories %}
-            <option value="{{ c }}" {% if c == category %}selected{% endif %}>{{ c }}</option>
-            {% endfor %}
-        </select>
+    <div class="store-chiprow">
+        <span class="store-chiprow__label">{{ _("Category") }}</span>
+        <a class="store-chip {{ 'is-active' if not category }}"
+           href="{{ url_for('marketplace.index', q=query or None, archetype=archetype) }}">{{ _("All") }}</a>
+        {% for c in categories %}
+        <a class="store-chip {{ 'is-active' if c == category }}"
+           href="{{ url_for('marketplace.index', q=query or None, archetype=archetype, category=c) }}">{{ c }}</a>
+        {% endfor %}
     </div>
     {% endif %}
-    <div class="col-6 col-md-2">
-        <button class="btn btn-primary w-100" type="submit">
-            <i class="align-middle" data-feather="search"></i>
-            <span class="align-middle">{{ _("Filter") }}</span>
-        </button>
+
+    <p class="store-resultline">
+        {{ _("%(count)d features", count=features|length) }}{% if query %} · “{{ query }}”{% endif %}
+        {% if query or archetype or category %} · <a href="{{ url_for('marketplace.index') }}">{{ _("Clear filters") }}</a>{% endif %}
+    </p>
+</div>
+
+<div class="container">
+    {% if features %}
+    <div class="store-grid">
+        {% for f in features %}
+        <a class="store-card" href="{{ url_for('marketplace.detail', short=f.short) }}">
+            <div class="store-card__top">
+                {{ mk.monogram(f.short) }}
+                <div class="store-card__idline">
+                    <span class="store-card__name">{{ f.short }}</span>
+                    <span class="store-card__badges">
+                        {{ mk.version_pill(f) }}
+                        {{ mk.archetype_badge(f.archetype) }}
+                    </span>
+                </div>
+            </div>
+            <p class="store-card__desc">{{ f.description or _("No description yet.") }}</p>
+            <div class="store-card__meta">
+                {% if f.pypi %}
+                <span class="store-meta-item store-meta-item--ok">{{ mk.icon("check-circle", 14) }}PyPI</span>
+                {% else %}
+                <span class="store-meta-item">{{ mk.icon("git-branch", 14) }}{{ _("source") }}</span>
+                {% endif %}
+                {% if f.used_by %}
+                <span class="store-meta-item">{{ mk.icon("users", 14) }}{{ _("used by %(count)d", count=f.used_by|length) }}</span>
+                {% endif %}
+                {% if f.category %}
+                <span class="store-meta-item">{{ mk.icon("tag", 14) }}{{ f.category }}</span>
+                {% endif %}
+            </div>
+        </a>
+        {% endfor %}
     </div>
-</form>
-
-<p class="text-muted mk-count">{{ _("%(count)d features", count=features|length) }}</p>
-
-{% if features %}
-<div class="mk-grid">
-    {% for f in features %}
-    <a class="mk-card" href="{{ url_for('marketplace.detail', short=f.short) }}">
-        <div class="d-flex align-items-center justify-content-between mb-2">
-            <span class="mk-card-title">{{ f.short }}</span>
-            {{ mk.archetype_badge(f.archetype) }}
-        </div>
-        <p class="mk-card-desc">{{ f.description or _("No description yet.") }}</p>
-        <div class="mk-card-meta">
-            <span class="mk-version">v{{ f.project_version or f.version or "0.0.0" }}</span>
-            {% if f.category %}<span>{{ f.category }}</span>{% endif %}
-            {% if f.refinement %}<span>{{ _("refinement") }}</span>{% endif %}
-        </div>
-    </a>
-    {% endfor %}
+    {% else %}
+    <div class="store-empty">
+        {{ mk.icon("search", 34) }}
+        <p>{{ _("No features match your search.") }}</p>
+        <a href="{{ url_for('marketplace.index') }}">{{ _("Clear filters") }}</a>
+    </div>
+    {% endif %}
 </div>
-{% else %}
-<div class="mk-empty">
-    <i data-feather="search"></i>
-    <p class="mb-1">{{ _("No features match your search.") }}</p>
-    <a href="{{ url_for('marketplace.index') }}">{{ _("Clear filters") }}</a>
-</div>
-{% endif %}
 {% endblock %}

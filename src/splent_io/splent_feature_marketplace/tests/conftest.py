@@ -186,9 +186,14 @@ SAMPLE_INDEX = {
 @pytest.fixture(autouse=True)
 def reset_marketplace_cache():
     """Keep the module-level TTL cache isolated between tests."""
-    marketplace_services._cache.update({"index": None, "fetched_at": 0.0})
+
+    def _reset():
+        marketplace_services._cache.update({"index": None, "fetched_at": 0.0})
+        marketplace_services._cache.pop("es_indexed_for", None)
+
+    _reset()
     yield
-    marketplace_services._cache.update({"index": None, "fetched_at": 0.0})
+    _reset()
 
 
 @pytest.fixture()

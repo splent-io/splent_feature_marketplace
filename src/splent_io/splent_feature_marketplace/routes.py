@@ -24,18 +24,37 @@ def index():
         category=category,
         archetypes=marketplace_service.archetypes(),
         categories=marketplace_service.categories(),
+        total_features=len(marketplace_service.all_features()),
+        total_spls=len(marketplace_service.spls()),
     )
 
 
 @marketplace_bp.route("/marketplace/spls", methods=["GET"])
 def spls():
     """The SPLs of the index, with their mandatory/optional/alternative features."""
+    # An SPL model may reference features that are not published in the index
+    # (e.g. only on GitHub/PyPI): those render as unlinked "external" chips
+    # instead of pointing to a detail page that would 404.
+    known_shorts = {
+        feature.get("short") for feature in marketplace_service.all_features()
+    }
+    # SOFT dependency on the configurator feature: the "Configure this line"
+    # CTA only renders when the product actually installs it. The URL is
+    # built here (not in the template) so the reference stays behind the
+    # runtime guard.
+    from flask import current_app
+
+    has_configurator = "configurator.configure" in current_app.view_functions
     spl_views = []
     for spl in marketplace_service.spls():
         model_features = (spl.get("model") or {}).get("features") or {}
         mandatory, optional, groups = [], [], {}
         for short, meta in model_features.items():
-            entry = dict(meta or {}, short=short)
+            entry = dict(
+                meta if isinstance(meta, dict) else {},
+                short=short,
+                external=short not in known_shorts,
+            )
             group = entry.get("group")
             if group:
                 bucket = groups.setdefault(
@@ -54,9 +73,24 @@ def spls():
                 "mandatory": sorted(mandatory, key=lambda e: e["short"]),
                 "optional": sorted(optional, key=lambda e: e["short"]),
                 "groups": groups,
+                "configure_url": (
+                    url_for("configurator.configure", spl_name=spl.get("name"))
+                    if has_configurator
+                    else None
+                ),
             }
         )
     return render_template("marketplace/spls.html", spls=spl_views)
+
+
+@marketplace_bp.route("/marketplace/publish", methods=["GET"])
+def publish():
+    """How third parties publish: release on GitHub + PR to the registry.
+
+    Static rules outrank converter rules in werkzeug, so this never falls
+    through to detail(<short>) even though both share the prefix.
+    """
+    return render_template("marketplace/publish.html")
 
 
 @marketplace_bp.route("/marketplace/<short>", methods=["GET"])

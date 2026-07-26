@@ -1,0 +1,100 @@
+{% extends "public_base.html" %}
+{% import "marketplace/_macros.html" as mk %}
+
+{% block title %}{{ _("Publish your feature") }} — {{ _("Marketplace") }}{% endblock %}
+
+{% block hero %}
+<section class="store-hero store-hero--slim">
+    <div class="container">
+        <h1 class="store-hero__title">{{ _("Publish your feature") }}</h1>
+        <p class="store-hero__subtitle">{{ _("There is no upload button — and that is the point. Releasing on your own GitHub is publishing; the marketplace index is rebuilt from your feature's contract.") }}</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="store-cols">
+
+        <div>
+            <ol class="store-howto">
+                <li class="store-howto__step">
+                    <span class="store-howto__num">1</span>
+                    <div>
+                        <h2 class="store-howto__title">{{ mk.icon("package") }}{{ _("Build your feature") }}</h2>
+                        <p class="store-howto__text">{{ _("Scaffold it in your SPLENT workspace. The contract — what it provides, what it requires — is inferred from the code and kept in the feature's own pyproject.toml. You never write index data by hand.") }}</p>
+                        <div class="store-terminal">
+                            <span class="store-terminal__prompt">$</span>
+                            <code>splent feature:create my_feature</code>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="store-howto__step">
+                    <span class="store-howto__num">2</span>
+                    <div>
+                        <h2 class="store-howto__title">{{ mk.icon("tag") }}{{ _("Release it") }}</h2>
+                        <p class="store-howto__text">{{ _("One command bumps the version, regenerates the contract, tags the repository and uploads to PyPI. The Git tag IS the publication — there is no separate submission step.") }}</p>
+                        <div class="store-terminal">
+                            <span class="store-terminal__prompt">$</span>
+                            <code>splent feature:release</code>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="store-howto__step">
+                    <span class="store-howto__num">3</span>
+                    <div>
+                        <h2 class="store-howto__title">{{ mk.icon("git-branch") }}{{ _("Get listed") }}</h2>
+                        <p class="store-howto__text">{{ _("Open a pull request adding your GitHub organisation or repository to the registry file of the index. Once reviewed and merged, the indexer reads your released tags — you never push data into the marketplace.") }}</p>
+                        <p class="store-howto__text">
+                            <a href="https://github.com/splent-io/splent_index" target="_blank" rel="noopener">splent-io/splent_index — registry.toml {{ mk.icon("external-link", 13) }}</a>
+                        </p>
+                    </div>
+                </li>
+
+                <li class="store-howto__step">
+                    <span class="store-howto__num">4</span>
+                    <div>
+                        <h2 class="store-howto__title">{{ mk.icon("check-circle") }}{{ _("You are in") }}</h2>
+                        <p class="store-howto__text">{{ _("The index rebuilds automatically from the latest released tags. Your feature appears here with its contract, dependencies and collisions. To fix or update anything, just release again.") }}</p>
+                        <p class="store-howto__text">
+                            <a href="{{ url_for('marketplace.index') }}">{{ _("Browse the catalog") }} {{ mk.icon("arrow-right", 13) }}</a>
+                        </p>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        <aside class="store-side">
+            <div class="store-meta-card">
+                <div class="store-meta-row">
+                    <span class="store-meta-row__label">{{ _("Accounts") }}</span>
+                    <span class="store-meta-row__value store-muted">{{ _("None needed") }}</span>
+                </div>
+                <div class="store-meta-row">
+                    <span class="store-meta-row__label">{{ _("Upload API") }}</span>
+                    <span class="store-meta-row__value store-muted">{{ _("Does not exist") }}</span>
+                </div>
+                <div class="store-meta-row">
+                    <span class="store-meta-row__label">{{ _("Source of truth") }}</span>
+                    <span class="store-meta-row__value"><code class="store-code">pyproject.toml</code></span>
+                </div>
+                <div class="store-meta-row">
+                    <span class="store-meta-row__label">{{ _("The index") }}</span>
+                    <span class="store-meta-row__value">{{ _("A regenerable cache") }}</span>
+                </div>
+            </div>
+
+            <div class="store-install">
+                <p class="store-install__title">{{ mk.icon("info") }}{{ _("Why no upload?") }}</p>
+                <p class="store-install__hint">{{ _("Anything uploaded can drift from the code it describes. Here the index is derived from released tags, so it can always be thrown away and rebuilt — it is never a second source of truth.") }}</p>
+                <p class="store-install__hint">
+                    <a href="https://docs.splent.io/marketplace/publishing" target="_blank" rel="noopener">{{ _("Read the full publishing guide") }} {{ mk.icon("external-link", 13) }}</a>
+                </p>
+            </div>
+        </aside>
+
+    </div>
+</div>
+{% endblock %}
