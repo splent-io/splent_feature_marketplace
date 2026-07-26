@@ -1,0 +1,148 @@
+{% extends "base_template.html" %}
+{% import "marketplace/_macros.html" as mk %}
+
+{% block title %}{{ feature.short }} — {{ _("Marketplace") }}{% endblock %}
+
+{% block head %}{% include "marketplace/_styles.html" %}{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('marketplace.index') }}">{{ _("Marketplace") }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ feature.short }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="mk-header">
+    <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+        <h1 class="h3 mb-0">{{ feature.short }}</h1>
+        {{ mk.archetype_badge(feature.archetype) }}
+        <span class="mk-version text-muted">v{{ feature.project_version or feature.version or "0.0.0" }}</span>
+        {% if feature.category %}<span class="badge bg-light text-dark">{{ feature.category }}</span>{% endif %}
+        {% if feature.env %}<span class="badge bg-warning text-dark">{{ feature.env }}</span>{% endif %}
+    </div>
+    <p class="text-muted mb-0">{{ feature.description or _("No description yet.") }}</p>
+</div>
+
+<div class="mk-install">
+    <code id="mk-install-cmd">{{ install_command }}</code>
+    <button class="btn btn-sm btn-outline-light" type="button" id="mk-copy"
+            data-copied="{{ _('Copied') }}">{{ _("Copy") }}</button>
+</div>
+
+<div class="row">
+    <div class="col-lg-7">
+        <h2 class="mk-section-title">{{ _("Provides") }}</h2>
+        {{ mk.contract_row(_("Models"), feature.provides.models) }}
+        {{ mk.contract_row(_("Services"), feature.provides.services) }}
+        {{ mk.contract_row(_("Routes"), feature.provides.routes) }}
+        {{ mk.contract_row(_("Hooks"), feature.provides.hooks) }}
+        {{ mk.contract_row(_("Signals"), feature.provides.signals) }}
+        {{ mk.contract_row(_("Commands"), feature.provides.commands) }}
+        {{ mk.contract_row(_("Translations"), feature.provides.translations) }}
+        {% if not (feature.provides.models or feature.provides.services or feature.provides.routes
+                   or feature.provides.hooks or feature.provides.signals or feature.provides.commands) %}
+        <p class="text-muted">{{ _("This feature declares no public contract surface.") }}</p>
+        {% endif %}
+
+        <h2 class="mk-section-title">{{ _("Requires") }}</h2>
+        {% if feature.requires.features %}
+        <div class="mk-contract-row">
+            <div class="mk-contract-label">{{ _("Features") }}</div>
+            <div class="mk-contract-values">
+                {% for dep in feature.requires.features %}{{ mk.feature_chip(dep) }}{% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {{ mk.contract_row(_("Env vars"), feature.requires.env_vars) }}
+        {{ mk.contract_row(_("Signals"), feature.requires.signals) }}
+        {% if not (feature.requires.features or feature.requires.env_vars or feature.requires.signals) %}
+        <p class="text-muted">{{ _("No hard dependencies.") }}</p>
+        {% endif %}
+
+        {% if feature.requires.features_optional %}
+        <h2 class="mk-section-title">{{ _("Works better with") }}</h2>
+        <div>
+            {% for dep in feature.requires.features_optional %}{{ mk.feature_chip(dep) }}{% endfor %}
+        </div>
+        {% endif %}
+
+        {% if feature.used_by %}
+        <h2 class="mk-section-title">{{ _("Used by") }}</h2>
+        <div>
+            {% for dep in feature.used_by %}{{ mk.feature_chip(dep) }}{% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-lg-5">
+        <h2 class="mk-section-title">{{ _("Availability") }}</h2>
+        <div class="mk-contract-row">
+            <div class="mk-contract-label">{{ _("PyPI") }}</div>
+            <div class="mk-contract-values">
+                {% if on_pypi %}
+                <span class="badge bg-success">{{ _("Published") }}{% if pypi_version %} · v{{ pypi_version }}{% endif %}</span>
+                {% else %}
+                <span class="badge bg-secondary">{{ _("Not published yet") }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="mk-contract-row">
+            <div class="mk-contract-label">{{ _("Repository") }}</div>
+            <div class="mk-contract-values">
+                <a href="{{ repo_url }}" target="_blank" rel="noopener">
+                    <i class="align-middle" data-feather="external-link"></i>
+                    <span class="align-middle">{{ feature.org }}/{{ feature.repo }}</span>
+                </a>
+            </div>
+        </div>
+        {% if feature.requires_python %}
+        <div class="mk-contract-row">
+            <div class="mk-contract-label">{{ _("Python") }}</div>
+            <div class="mk-contract-values"><code class="mk-code">{{ feature.requires_python }}</code></div>
+        </div>
+        {% endif %}
+        {% if feature.source %}
+        <div class="mk-contract-row">
+            <div class="mk-contract-label">{{ _("Source") }}</div>
+            <div class="mk-contract-values"><code class="mk-code">{{ feature.source }}</code></div>
+        </div>
+        {% endif %}
+
+        {% if collisions %}
+        <h2 class="mk-section-title">{{ _("Collisions") }}</h2>
+        <div class="alert alert-warning mb-0">
+            <p class="mb-2">{{ _("This feature collides with others on:") }}</p>
+            <ul class="mb-0">
+                {% for c in collisions %}
+                <li>
+                    <code class="mk-code">{{ c.item }}</code>
+                    <span class="text-muted">({{ c.kind }})</span> —
+                    {% for other in c.features if other != feature.short %}{{ mk.feature_chip(other) }}{% endfor %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    (function () {
+        var button = document.getElementById("mk-copy");
+        if (!button || !navigator.clipboard) return;
+        button.addEventListener("click", function () {
+            var command = document.getElementById("mk-install-cmd").textContent.trim();
+            navigator.clipboard.writeText(command).then(function () {
+                var original = button.textContent;
+                button.textContent = button.dataset.copied;
+                setTimeout(function () { button.textContent = original; }, 2000);
+            });
+        });
+    })();
+</script>
+{% endblock %}

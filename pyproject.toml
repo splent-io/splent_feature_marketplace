@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=80.3.1", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "splent_feature_marketplace"
+version = "0.0.1"
+readme = "README.md"
+requires-python = ">=3.13"
+
+dependencies = [
+
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["*.tests", "*.tests.*"]
+
+[tool.splent]
+cli_version = "1.14.0"
+
+# ── Feature Contract (auto-generated) ────────────────────────────────────────
+# Do not edit manually — re-run `splent feature:contract --write` to refresh.
+# Preserved across refreshes: description, category, tags, env, and
+# requires.features_manual (dependencies invisible to static analysis).
+[tool.splent.contract]
+description = "Public SPLENT marketplace catalog: browse features, their contracts and the SPLs from the shared index"
+archetype = "light"
+
+[tool.splent.contract.provides]
+routes     = ["/", "/marketplace", "/marketplace/<short>", "/marketplace/spls"]
+blueprints = []
+models     = []
+commands   = []
+hooks      = ["layout.sidebar.top"]
+services   = ["MarketplaceService"]
+signals    = []
+translations = []
+docker     = []
+
+[tool.splent.contract.requires]
+features = []
+env_vars = ["SPLENT_INDEX_URL", "WORKING_DIR"]
+signals  = []
+
+[tool.splent.contract.extensible]
+services  = ["MarketplaceService"]
+templates = ["marketplace/detail.html", "marketplace/index.html", "marketplace/spls.html"]
+models    = []
+hooks     = ["layout.sidebar.top"]
+routes    = false

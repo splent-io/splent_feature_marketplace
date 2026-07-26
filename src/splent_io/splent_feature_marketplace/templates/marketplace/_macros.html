@@ -1,0 +1,24 @@
+{% macro archetype_badge(archetype) -%}
+    {%- set cls = {
+        "full": "bg-primary",
+        "light": "bg-info text-dark",
+        "service": "bg-success",
+        "config": "bg-secondary",
+    }.get(archetype, "bg-secondary") -%}
+    <span class="badge {{ cls }} text-uppercase mk-badge">{{ archetype }}</span>
+{%- endmacro %}
+
+{% macro feature_chip(short) -%}
+    <a class="mk-chip" href="{{ url_for('marketplace.detail', short=short) }}">{{ short }}</a>
+{%- endmacro %}
+
+{% macro contract_row(label, items) -%}
+    {% if items %}
+    <div class="mk-contract-row">
+        <div class="mk-contract-label">{{ label }}</div>
+        <div class="mk-contract-values">
+            {% for item in items %}<code class="mk-code">{{ item }}</code>{% endfor %}
+        </div>
+    </div>
+    {% endif %}
+{%- endmacro %}

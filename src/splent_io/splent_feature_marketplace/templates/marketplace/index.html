@@ -1,0 +1,80 @@
+{% extends "base_template.html" %}
+{% import "marketplace/_macros.html" as mk %}
+
+{% block title %}{{ _("Marketplace") }}{% endblock %}
+
+{% block head %}{% include "marketplace/_styles.html" %}{% endblock %}
+
+{% block content %}
+<div class="mk-header d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+        <h1 class="h3 mb-1">{{ _("Marketplace") }}</h1>
+        <p class="text-muted mb-0">{{ _("Reusable SPLENT features you can install into your products.") }}</p>
+    </div>
+    <a class="btn btn-outline-primary" href="{{ url_for('marketplace.spls') }}">
+        <i class="align-middle" data-feather="layers"></i>
+        <span class="align-middle">{{ _("Product lines") }}</span>
+    </a>
+</div>
+
+<form class="row g-2 align-items-end mk-filters" method="get" action="{{ url_for('marketplace.index') }}">
+    <div class="col-12 col-md-5">
+        <label class="form-label" for="mk-q">{{ _("Search") }}</label>
+        <input class="form-control" type="search" id="mk-q" name="q" value="{{ query }}"
+               placeholder="{{ _('Name, description or tag') }}">
+    </div>
+    <div class="col-6 col-md-3">
+        <label class="form-label" for="mk-archetype">{{ _("Archetype") }}</label>
+        <select class="form-select" id="mk-archetype" name="archetype">
+            <option value="">{{ _("All archetypes") }}</option>
+            {% for a in archetypes %}
+            <option value="{{ a }}" {% if a == archetype %}selected{% endif %}>{{ a }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% if categories %}
+    <div class="col-6 col-md-2">
+        <label class="form-label" for="mk-category">{{ _("Category") }}</label>
+        <select class="form-select" id="mk-category" name="category">
+            <option value="">{{ _("All categories") }}</option>
+            {% for c in categories %}
+            <option value="{{ c }}" {% if c == category %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+    <div class="col-6 col-md-2">
+        <button class="btn btn-primary w-100" type="submit">
+            <i class="align-middle" data-feather="search"></i>
+            <span class="align-middle">{{ _("Filter") }}</span>
+        </button>
+    </div>
+</form>
+
+<p class="text-muted mk-count">{{ _("%(count)d features", count=features|length) }}</p>
+
+{% if features %}
+<div class="mk-grid">
+    {% for f in features %}
+    <a class="mk-card" href="{{ url_for('marketplace.detail', short=f.short) }}">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="mk-card-title">{{ f.short }}</span>
+            {{ mk.archetype_badge(f.archetype) }}
+        </div>
+        <p class="mk-card-desc">{{ f.description or _("No description yet.") }}</p>
+        <div class="mk-card-meta">
+            <span class="mk-version">v{{ f.project_version or f.version or "0.0.0" }}</span>
+            {% if f.category %}<span>{{ f.category }}</span>{% endif %}
+            {% if f.refinement %}<span>{{ _("refinement") }}</span>{% endif %}
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="mk-empty">
+    <i data-feather="search"></i>
+    <p class="mb-1">{{ _("No features match your search.") }}</p>
+    <a href="{{ url_for('marketplace.index') }}">{{ _("Clear filters") }}</a>
+</div>
+{% endif %}
+{% endblock %}
