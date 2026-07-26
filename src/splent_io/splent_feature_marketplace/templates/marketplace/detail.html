@@ -1,7 +1,7 @@
 {% extends "public_base.html" %}
 {% import "marketplace/_macros.html" as mk %}
 
-{% block title %}{{ feature.short }} — {{ _("Marketplace") }}{% endblock %}
+{% block title %}{{ feature.short }} · {{ _("Marketplace") }}{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -104,7 +104,7 @@
                     <ul>
                         {% for c in collisions %}
                         <li>
-                            <code class="store-code">{{ c.item }}</code> ({{ c.kind }}) —
+                            <code class="store-code">{{ c.item }}</code> ({{ c.kind }}) {{ _("also provided by") }}
                             {% for other in c.features if other != feature.short %}{{ mk.feature_chip(other) }}{% endfor %}
                         </li>
                         {% endfor %}

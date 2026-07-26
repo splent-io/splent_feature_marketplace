@@ -1,7 +1,7 @@
 {% extends "public_base.html" %}
 {% import "marketplace/_macros.html" as mk %}
 
-{% block title %}{{ _("Marketplace") }} — {{ site.name }}{% endblock %}
+{% block title %}{{ _("Marketplace") }} · {{ site.name }}{% endblock %}
 
 {% block hero %}
 <section class="store-hero">
@@ -12,7 +12,7 @@
             {% if archetype %}<input type="hidden" name="archetype" value="{{ archetype }}">{% endif %}
             {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
             <input class="store-search__input" type="search" name="q" value="{{ query }}"
-                   placeholder="{{ _('Search features — name, description or tag') }}"
+                   placeholder="{{ _('Search features by name, description or tag') }}"
                    aria-label="{{ _('Search features') }}" autocomplete="off">
             <button class="store-search__btn" type="submit">{{ mk.icon("search", 18) }}{{ _("Search") }}</button>
         </form>

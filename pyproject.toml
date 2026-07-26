@@ -28,7 +28,7 @@ cli_version = "1.14.0"
 # Preserved across refreshes: description, category, tags, env, and
 # requires.features_manual (dependencies invisible to static analysis).
 [tool.splent.contract]
-description = "Public SPLENT marketplace catalog: browse features, their contracts and the SPLs from the shared index"
+description = "Public SPLENT marketplace catalog. Browse features, their contracts and the SPLs from the shared index"
 archetype = "light"
 
 [tool.splent.contract.provides]
