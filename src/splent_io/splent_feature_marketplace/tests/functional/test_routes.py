@@ -151,3 +151,65 @@ def test_publish_is_not_swallowed_by_the_detail_route(test_client, stub_index):
     response = test_client.get("/marketplace/publish")
     assert response.status_code == 200
     assert "Publish your feature" in _html(response)
+
+
+# ── distribution state, git tag and PyPI are independent ──────────────────
+
+
+def _detail(test_client, short):
+    response = test_client.get(f"/marketplace/{short}")
+    assert response.status_code == 200
+    return _html(response)
+
+
+def test_a_feature_on_pypi_shows_its_published_version(test_client, stub_index):
+    html = _detail(test_client, "events")
+    assert "v1.2.0" in html
+    assert "Not published" not in html
+
+
+def test_a_feature_without_pypi_says_so(test_client, stub_index):
+    """The regression: pypi is a dict, and {'published': false} is truthy, so
+    every feature claimed to be on PyPI."""
+    html = _detail(test_client, "mail")
+    assert "Not published" in html
+    assert "A production build resolves features from PyPI" in html
+
+
+def test_a_released_but_unpublished_feature_is_not_claimed_as_published(
+    test_client, monkeypatch, sample_index
+):
+    from splent_io.splent_feature_marketplace.services import MarketplaceService
+
+    degraded = dict(sample_index)
+    degraded["features"] = [
+        dict(
+            f,
+            pypi={"published": False, "latest": None, "has_current": False},
+        )
+        for f in sample_index["features"]
+    ]
+    monkeypatch.setattr(MarketplaceService, "_read_local", lambda self: degraded)
+
+    html = _detail(test_client, "events")
+    assert "Not published" in html
+
+    grid = _html(test_client.get("/marketplace"))
+    assert "source only" in grid
+
+
+def test_pypi_behind_the_tag_is_flagged(test_client, monkeypatch, sample_index):
+    from splent_io.splent_feature_marketplace.services import MarketplaceService
+
+    behind = dict(sample_index)
+    behind["features"] = [
+        dict(f, pypi={"published": True, "latest": "0.9.0", "has_current": False})
+        if f["short"] == "events"
+        else f
+        for f in sample_index["features"]
+    ]
+    monkeypatch.setattr(MarketplaceService, "_read_local", lambda self: behind)
+
+    html = _detail(test_client, "events")
+    assert "behind" in html
+    assert "0.9.0" in html

@@ -108,19 +108,28 @@ def detail(short):
     else:
         repo_url = f"https://github.com/{feature.get('org')}/{feature.get('repo')}"
 
+    # Distribution is two independent axes. A feature is in this catalog
+    # because it has a released git tag, which says nothing about PyPI: the
+    # indexer records PyPI separately as {published, latest, has_current}.
+    # Testing the dict for truth reported every feature as published, since a
+    # dict saying "published": false is still a non-empty dict.
     pypi = feature.get("pypi")
-    pypi_version = None
     if isinstance(pypi, dict):
-        pypi_version = pypi.get("version")
-    elif isinstance(pypi, str):
-        pypi_version = pypi
+        on_pypi = bool(pypi.get("published"))
+        pypi_version = pypi.get("latest")
+        pypi_has_current = bool(pypi.get("has_current"))
+    elif isinstance(pypi, str) and pypi:
+        on_pypi, pypi_version, pypi_has_current = True, pypi, True
+    else:
+        on_pypi, pypi_version, pypi_has_current = False, None, False
 
     return render_template(
         "marketplace/detail.html",
         feature=feature,
         repo_url=repo_url,
         pypi_version=pypi_version,
-        on_pypi=bool(pypi),
+        pypi_has_current=pypi_has_current,
+        on_pypi=on_pypi,
         install_command=f"splent feature:install {feature.get('id')}",
         collisions=marketplace_service.collisions_for(feature.get("short")),
     )

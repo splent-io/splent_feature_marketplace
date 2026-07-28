@@ -71,10 +71,14 @@
             </div>
             <p class="store-card__desc">{{ f.description or _("No description yet.") }}</p>
             <div class="store-card__meta">
-                {% if f.pypi %}
+                {# Two independent axes. Every indexed feature has a git tag;
+                   PyPI is separate, and a "published": false dict is still
+                   truthy, which used to mark everything as on PyPI. #}
+                <span class="store-meta-item">{{ mk.icon("tag", 14) }}{{ f.version or f.project_version }}</span>
+                {% if f.pypi and f.pypi.published %}
                 <span class="store-meta-item store-meta-item--ok">{{ mk.icon("check-circle", 14) }}PyPI</span>
                 {% else %}
-                <span class="store-meta-item">{{ mk.icon("git-branch", 14) }}{{ _("source") }}</span>
+                <span class="store-meta-item">{{ mk.icon("git-branch", 14) }}{{ _("source only") }}</span>
                 {% endif %}
                 {% if f.used_by %}
                 <span class="store-meta-item">{{ mk.icon("users", 14) }}{{ _("used by %(count)d", count=f.used_by|length) }}</span>

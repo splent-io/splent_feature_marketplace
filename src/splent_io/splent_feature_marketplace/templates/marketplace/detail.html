@@ -129,19 +129,30 @@
 
             <div class="store-meta-card">
                 <div class="store-meta-row">
-                    <span class="store-meta-row__label">{{ _("Version") }}</span>
-                    <span class="store-meta-row__value">{{ mk.version_pill(feature) }}</span>
+                    <span class="store-meta-row__label">{{ _("Git tag") }}</span>
+                    <span class="store-meta-row__value">
+                        <span class="store-ok">{{ mk.icon("tag", 14) }} {{ mk.version_pill(feature) }}</span>
+                    </span>
                 </div>
                 <div class="store-meta-row">
                     <span class="store-meta-row__label">PyPI</span>
                     <span class="store-meta-row__value">
-                        {% if on_pypi %}
-                        <span class="store-ok">{{ mk.icon("check-circle", 14) }} {{ _("Published") }}{% if pypi_version %} · v{{ pypi_version }}{% endif %}</span>
+                        {% if on_pypi and pypi_has_current %}
+                        <span class="store-ok">{{ mk.icon("check-circle", 14) }} v{{ pypi_version }}</span>
+                        {% elif on_pypi %}
+                        <span class="store-warn">{{ mk.icon("alert-triangle", 14) }} {{ _("behind, latest is v%(v)s", v=pypi_version) }}</span>
                         {% else %}
-                        <span class="store-muted">{{ _("Not published yet") }}</span>
+                        <span class="store-muted">{{ _("Not published") }}</span>
                         {% endif %}
                     </span>
                 </div>
+                {% if not (on_pypi and pypi_has_current) %}
+                <div class="store-meta-row store-meta-row--note">
+                    <span class="store-meta-row__value store-muted">
+                        {{ _("Install it from source. A production build resolves features from PyPI, so this version is not available there yet.") }}
+                    </span>
+                </div>
+                {% endif %}
                 <div class="store-meta-row">
                     <span class="store-meta-row__label">{{ _("Repository") }}</span>
                     <span class="store-meta-row__value">

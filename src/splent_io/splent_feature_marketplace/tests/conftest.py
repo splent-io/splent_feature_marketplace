@@ -48,7 +48,7 @@ SAMPLE_INDEX = {
             "requires_python": ">=3.13",
             "source": "workspace",
             "used_by": ["public"],
-            "pypi": {"version": "1.2.0"},
+            "pypi": {"published": True, "latest": "1.2.0", "has_current": True},
             "github": "https://github.com/splent-io/splent_feature_events",
         },
         {
