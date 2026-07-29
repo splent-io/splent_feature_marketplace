@@ -210,3 +210,19 @@ def stub_index(monkeypatch, sample_index):
         lambda self, force=False: sample_index,
     )
     return sample_index
+
+
+@pytest.fixture(autouse=True)
+def no_remote_index(monkeypatch):
+    """No test in this suite reaches the published index.
+
+    The service reads both sources and serves whichever was generated
+    later, so a test that patches only the local one would otherwise be
+    describing whatever the real published index happens to contain that
+    day. A test that wants the remote patches it itself.
+    """
+    monkeypatch.setattr(
+        marketplace_services.MarketplaceService,
+        "_fetch_remote",
+        lambda self: (_ for _ in ()).throw(OSError("no network in tests")),
+    )

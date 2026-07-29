@@ -25,8 +25,10 @@ cli_version = "1.14.0"
 
 # ── Feature Contract (auto-generated) ────────────────────────────────────────
 # Do not edit manually — re-run `splent feature:contract --write` to refresh.
-# Preserved across refreshes: description, category, tags, env, and
-# requires.features_manual (dependencies invisible to static analysis).
+# Preserved across refreshes: description, category, tags, env,
+# requires.features_manual (dependencies invisible to static analysis)
+# and provides.routes_manual (routes built from configuration at
+# registration time, which have no literal path to find in source).
 [tool.splent.contract]
 description = "Public SPLENT marketplace catalog. Browse features, their contracts and the SPLs from the shared index"
 archetype = "light"
@@ -45,7 +47,7 @@ docker     = []
 [tool.splent.contract.requires]
 features = []
 features_optional = ["elasticsearch"]
-env_vars = ["SPLENT_INDEX_URL", "WORKING_DIR"]
+env_vars = ["SPLENT_INDEX_TTL_SECONDS", "SPLENT_INDEX_URL", "WORKING_DIR"]
 signals  = []
 
 [tool.splent.contract.extensible]

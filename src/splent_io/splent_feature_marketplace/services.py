@@ -25,7 +25,10 @@ import urllib.request
 from flask import current_app, has_app_context
 
 DEFAULT_INDEX_URL = "https://splent-io.github.io/splent_index/index.json"
-CACHE_TTL_SECONDS = 300
+# How long a fetched index is reused. Short on purpose: what a developer
+# publishes has to show up here without anyone restarting anything, and a
+# static JSON on a CDN is cheap to re-read. Products can raise it.
+CACHE_TTL_SECONDS = 60
 FETCH_TIMEOUT_SECONDS = 10
 INDEX_SCHEMA = 1
 
@@ -103,36 +106,72 @@ class MarketplaceService:
                     feature[list_key] = []
         return index
 
+    def _cache_ttl(self) -> int:
+        if has_app_context():
+            return int(
+                current_app.config.get("SPLENT_INDEX_TTL_SECONDS", CACHE_TTL_SECONDS)
+            )
+        return CACHE_TTL_SECONDS
+
+    def _read_valid(self, reader):
+        """Read one source, or None when it is unusable.
+
+        Both sources are untrusted: a remote URL that may be down and a
+        local file anyone can edit. A malformed document is treated as
+        absent so the other source can win.
+        """
+        try:
+            data = reader()
+        except Exception:
+            return None
+        return data if self._is_index(data) else None
+
+    @staticmethod
+    def _newer_index(local, remote):
+        """The more recently generated of two indexes.
+
+        An index with no generated_at loses to one that has it, and ties go
+        to the remote: the published index is the shared answer, so it is
+        the better default when there is nothing to choose between them.
+        """
+        if local is None:
+            return remote
+        if remote is None:
+            return local
+        if (remote.get("generated_at") or "") >= (local.get("generated_at") or ""):
+            return remote
+        return local
+
     def _load_index(self, force=False):
         """Return the index dict, honouring the TTL cache and fallbacks."""
         now = time.time()
         if (
             not force
             and _cache["index"] is not None
-            and now - _cache["fetched_at"] < CACHE_TTL_SECONDS
+            and now - _cache["fetched_at"] < self._cache_ttl()
         ):
             return _cache["index"]
 
-        # A local workspace cache means a development checkout: the freshly
-        # built index there is the truth (it may include SPLs/features not
-        # published yet). Production containers have no workspace cache and
-        # read the published index. A malformed local copy (unparseable OR
-        # wrong shape) falls through to the remote index.
-        try:
-            index = self._read_local()
-            if not self._is_index(index):
-                raise ValueError("malformed local marketplace index")
-        except (OSError, ValueError):
-            try:
-                index = self._fetch_remote()
-                if not self._is_index(index):
-                    raise ValueError("malformed remote marketplace index")
-            except Exception:
-                # No valid local copy and no valid remote: keep serving the
-                # stale in-memory index if we ever had one.
-                if _cache["index"] is not None:
-                    return _cache["index"]
-                return EMPTY_INDEX
+        # Whichever index was generated later wins.
+        #
+        # The rule used to be "a local workspace cache means a development
+        # checkout, so local is the truth". That holds for a laptop, and it
+        # is wrong for a deployment that runs from a workspace: the server
+        # then looks like a checkout and serves a local copy that never
+        # expires, so a freshly published feature or product line simply
+        # never appears. Comparing generated_at gives both what they want
+        # with nothing to configure: a developer who just ran
+        # marketplace:index gets their own build, and a server whose copy is
+        # older than the published one follows the published one.
+        local = self._read_valid(self._read_local)
+        remote = self._read_valid(self._fetch_remote)
+        index = self._newer_index(local, remote)
+        if index is None:
+            # Neither source is usable: keep serving the last good copy
+            # rather than emptying the catalogue.
+            if _cache["index"] is not None:
+                return _cache["index"]
+            return EMPTY_INDEX
 
         index = self._normalize_index(index)
         _cache["index"] = index

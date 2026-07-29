@@ -8,11 +8,21 @@ To regenerate from source code: splent feature:inject-config splent_feature_mark
 
 import os
 
-from splent_io.splent_feature_marketplace.services import DEFAULT_INDEX_URL
+from splent_io.splent_feature_marketplace.services import (
+    CACHE_TTL_SECONDS,
+    DEFAULT_INDEX_URL,
+)
 
 
 def inject_config(app):
     # setdefault: respect anything the product/.env already set; only fill gaps.
     app.config.setdefault(
         "SPLENT_INDEX_URL", os.getenv("SPLENT_INDEX_URL", DEFAULT_INDEX_URL)
+    )
+    # How long a fetched index is reused before it is read again. Low so a
+    # publication shows up here on its own; raise it if the index is large
+    # or served from somewhere slow.
+    app.config.setdefault(
+        "SPLENT_INDEX_TTL_SECONDS",
+        int(os.getenv("SPLENT_INDEX_TTL_SECONDS", CACHE_TTL_SECONDS)),
     )
