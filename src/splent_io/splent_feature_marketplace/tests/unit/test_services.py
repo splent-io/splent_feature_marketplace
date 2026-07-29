@@ -5,7 +5,6 @@ MarketplaceService is exercised in isolation: the remote index fetch and the
 local workspace cache are mocked, so no network or disk state is touched.
 """
 
-import json
 import types
 from unittest.mock import MagicMock
 from urllib.error import URLError
