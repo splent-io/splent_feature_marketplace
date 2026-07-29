@@ -132,9 +132,7 @@ def test_spls_page_shows_groups_and_features(test_client, stub_index):
 # ── GET /marketplace/publish ──────────────────────────────────────────────
 
 
-def test_publish_page_explains_the_release_and_registry_flow(
-    test_client, stub_index
-):
+def test_publish_page_explains_the_release_and_registry_flow(test_client, stub_index):
     response = test_client.get("/marketplace/publish")
     assert response.status_code == 200
     html = _html(response)

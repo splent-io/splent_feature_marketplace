@@ -157,7 +157,6 @@ class MarketplaceService:
                 return feature
         return None
 
-
     # ── optional Elasticsearch (soft dependency) ─────────────────────────
 
     ES_INDEX_NAME = "marketplace_features"
@@ -271,8 +270,12 @@ class MarketplaceService:
 
     def archetypes(self):
         """Distinct archetypes present in the index (for filter controls)."""
-        return sorted({f.get("archetype") for f in self.all_features() if f.get("archetype")})
+        return sorted(
+            {f.get("archetype") for f in self.all_features() if f.get("archetype")}
+        )
 
     def categories(self):
         """Distinct categories present in the index (for filter controls)."""
-        return sorted({f.get("category") for f in self.all_features() if f.get("category")})
+        return sorted(
+            {f.get("category") for f in self.all_features() if f.get("category")}
+        )

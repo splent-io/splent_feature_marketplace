@@ -18,9 +18,7 @@ from splent_io.splent_feature_marketplace.services import MarketplaceService
 @pytest.fixture()
 def remote_index(monkeypatch, sample_index):
     """Serve the sample index through the remote fetch path."""
-    monkeypatch.setattr(
-        MarketplaceService, "_fetch_remote", lambda self: sample_index
-    )
+    monkeypatch.setattr(MarketplaceService, "_fetch_remote", lambda self: sample_index)
     return sample_index
 
 
@@ -34,7 +32,6 @@ def network_down(monkeypatch):
 
 
 # ── queries ───────────────────────────────────────────────────────────────
-
 
 
 @pytest.fixture(autouse=True)
@@ -139,14 +136,10 @@ def test_cache_expires_after_ttl(monkeypatch, sample_index):
     assert fetch.call_count == 2
 
 
-def test_local_cache_is_preferred_over_remote(
-    network_down, monkeypatch, sample_index
-):
+def test_local_cache_is_preferred_over_remote(network_down, monkeypatch, sample_index):
     # Local-first: a readable workspace cache is served without ever touching
     # the network (network_down would make any remote attempt blow up).
-    monkeypatch.setattr(
-        MarketplaceService, "_read_local", lambda self: sample_index
-    )
+    monkeypatch.setattr(MarketplaceService, "_read_local", lambda self: sample_index)
 
     features = MarketplaceService().all_features()
     assert [f["short"] for f in features] == ["events", "mail", "theme"]
@@ -334,8 +327,6 @@ def test_search_falls_back_when_elasticsearch_errors(remote_index, monkeypatch):
         def search(self, index, query_body):
             raise RuntimeError("es down mid-flight")
 
-    monkeypatch.setattr(
-        MarketplaceService, "_es_service", lambda self: _BrokenES([])
-    )
+    monkeypatch.setattr(MarketplaceService, "_es_service", lambda self: _BrokenES([]))
     results = MarketplaceService().search(query="SMTP")
     assert [f["short"] for f in results] == ["mail"]
