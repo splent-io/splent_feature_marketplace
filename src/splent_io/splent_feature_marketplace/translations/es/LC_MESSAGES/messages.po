@@ -1,0 +1,402 @@
+# Spanish translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-07-30 12:00+0000\n"
+"PO-Revision-Date: 2026-07-30 12:00+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/_macros.html:49
+msgid "Not published in this index yet"
+msgstr "Todavía no está publicada en este índice"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/_macros.html:49
+msgid "external"
+msgstr "externa"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:4
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:10
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:4
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:4
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/spls.html:4
+msgid "Marketplace"
+msgstr "Marketplace"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:9
+msgid "Breadcrumb"
+msgstr "Ruta de navegación"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:27
+msgid "refinement"
+msgstr "refinamiento"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:37
+msgid "About"
+msgstr "Descripción"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:38
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:72
+msgid "No description yet."
+msgstr "Todavía no hay descripción."
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:42
+msgid "Provides"
+msgstr "Qué aporta"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:47
+msgid "Models"
+msgstr "Modelos"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:48
+msgid "Services"
+msgstr "Servicios"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:49
+msgid "Routes"
+msgstr "Rutas"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:50
+msgid "Hooks"
+msgstr "Hooks"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:51
+msgid "Signals"
+msgstr "Señales"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:52
+msgid "Commands"
+msgstr "Comandos"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:53
+msgid "Translations"
+msgstr "Traducciones"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:56
+msgid "This feature declares no public contract surface."
+msgstr "Esta feature no declara nada en su contrato público."
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:61
+msgid "Dependencies"
+msgstr "Dependencias"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:64
+msgid "Requires"
+msgstr "Necesita"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:72
+msgid "Works better with"
+msgstr "Funciona mejor con"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:80
+msgid "Used by"
+msgstr "La usan"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:88
+msgid "Env vars"
+msgstr "Variables de entorno"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:96
+msgid "No hard dependencies."
+msgstr "Sin dependencias obligatorias."
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:103
+msgid "Collisions"
+msgstr "Colisiones"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:107
+msgid "also provided by"
+msgstr "también lo aportan"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:120
+msgid "Install"
+msgstr "Instalar"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:125
+msgid "Copied"
+msgstr "Copiado"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:125
+msgid "Copy"
+msgstr "Copiar"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:127
+msgid "Run inside your SPLENT workspace with a product selected."
+msgstr "Ejecútalo en tu workspace de SPLENT con un producto seleccionado."
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:132
+msgid "Git tag"
+msgstr "Etiqueta de Git"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:143
+#, python-format
+msgid "behind, latest is v%(v)s"
+msgstr "por detrás, la última es la v%(v)s"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:145
+msgid "Not published"
+msgstr "Sin publicar"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:152
+msgid ""
+"Install it from source. A production build resolves features from PyPI, "
+"so this version is not available there yet."
+msgstr ""
+"Instálala desde el código fuente. Una construcción de producción resuelve"
+" las features desde PyPI, y esta versión todavía no está allí."
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:157
+msgid "Repository"
+msgstr "Repositorio"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:164
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:31
+msgid "Archetype"
+msgstr "Arquetipo"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:170
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:41
+msgid "Category"
+msgstr "Categoría"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:176
+msgid "Python"
+msgstr "Python"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:182
+msgid "Source"
+msgstr "Código fuente"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/detail.html:188
+msgid "Tags"
+msgstr "Etiquetas"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:9
+msgid "The SPLENT feature marketplace"
+msgstr "El marketplace de features de SPLENT"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:10
+msgid ""
+"Reusable, contract-verified features you can install into any SPLENT "
+"product with one command."
+msgstr ""
+"Features reutilizables y con el contrato verificado que puedes instalar "
+"en cualquier producto SPLENT con un solo comando."
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:15
+msgid "Search features by name, description or tag"
+msgstr "Busca features por nombre, descripción o etiqueta"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:16
+msgid "Search features"
+msgstr "Buscar features"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:17
+msgid "Search"
+msgstr "Buscar"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:20
+msgid "features"
+msgstr "features"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:22
+msgid "product lines"
+msgstr "líneas de producto"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:33
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:43
+msgid "All"
+msgstr "Todas"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:52
+#, python-format
+msgid "%(count)d features"
+msgstr "%(count)d features"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:53
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:97
+msgid "Clear filters"
+msgstr "Quitar filtros"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:81
+msgid "source only"
+msgstr "solo código fuente"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:84
+#, python-format
+msgid "used by %(count)d"
+msgstr "la usan %(count)d"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/index.html:96
+msgid "No features match your search."
+msgstr "No hay features que coincidan con tu búsqueda."
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:4
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:9
+msgid "Publish your feature"
+msgstr "Publica tu feature"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:10
+msgid ""
+"There is no upload button, and that is the point. Releasing on your own "
+"GitHub is publishing, and the marketplace index is rebuilt from your "
+"feature's contract."
+msgstr ""
+"No hay botón de subida, y esa es la idea. Publicar una versión en tu "
+"propio GitHub ya es publicar, y el índice del marketplace se reconstruye "
+"a partir del contrato de tu feature."
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:24
+msgid "Build your feature"
+msgstr "Construye tu feature"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:25
+msgid ""
+"Scaffold it in your SPLENT workspace. The contract (what it provides and "
+"what it requires) is inferred from the code and kept in the feature's own"
+" pyproject.toml. You never write index data by hand."
+msgstr ""
+"Créala con el andamiaje de tu workspace de SPLENT. El contrato (qué "
+"aporta y qué necesita) se deduce del código y se guarda en el "
+"pyproject.toml de la propia feature. Nunca escribes a mano los datos del "
+"índice."
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:36
+msgid "Release it"
+msgstr "Publica una versión"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:37
+msgid ""
+"One command bumps the version, regenerates the contract, tags the "
+"repository and uploads to PyPI. The Git tag IS the publication. There is "
+"no separate submission step."
+msgstr ""
+"Un solo comando sube la versión, regenera el contrato, etiqueta el "
+"repositorio y lo publica en PyPI. La etiqueta de Git ES la publicación. "
+"No hay un paso de envío aparte."
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:48
+msgid "Get listed"
+msgstr "Entra en el índice"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:49
+msgid ""
+"Open a pull request adding your GitHub organisation or repository to the "
+"registry file of the index. Once reviewed and merged, the indexer reads "
+"your released tags. You never push data into the marketplace."
+msgstr ""
+"Abre una pull request para añadir tu organización o tu repositorio de "
+"GitHub al fichero de registro del índice. Una vez revisada y fusionada, "
+"el indexador lee tus etiquetas publicadas. Nunca envías datos al "
+"marketplace."
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:59
+msgid "You are in"
+msgstr "Ya estás dentro"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:60
+msgid ""
+"The index rebuilds automatically from the latest released tags. Your "
+"feature appears here with its contract, dependencies and collisions. To "
+"fix or update anything, just release again."
+msgstr ""
+"El índice se reconstruye solo a partir de las últimas etiquetas "
+"publicadas. Tu feature aparece aquí con su contrato, sus dependencias y "
+"sus colisiones. Para corregir o actualizar cualquier cosa, publica otra "
+"versión."
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:62
+msgid "Browse the catalog"
+msgstr "Ver el catálogo"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:72
+msgid "Accounts"
+msgstr "Cuentas"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:73
+msgid "None needed"
+msgstr "No hace falta ninguna"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:76
+msgid "Upload API"
+msgstr "API de subida"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:77
+msgid "Does not exist"
+msgstr "No existe"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:80
+msgid "Source of truth"
+msgstr "Fuente de verdad"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:84
+msgid "The index"
+msgstr "El índice"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:85
+msgid "A regenerable cache"
+msgstr "Una caché que se puede regenerar"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:90
+msgid "Why no upload?"
+msgstr "¿Por qué no hay subida?"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:91
+msgid ""
+"Anything uploaded can drift from the code it describes. Here the index is"
+" derived from released tags, so it can always be thrown away and rebuilt."
+" It is never a second source of truth."
+msgstr ""
+"Todo lo que se sube puede acabar separándose del código que describe. "
+"Aquí el índice se deriva de las etiquetas publicadas, así que siempre se "
+"puede tirar y reconstruir. Nunca es una segunda fuente de verdad."
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/publish.html:93
+msgid "Read the full publishing guide"
+msgstr "Leer la guía completa de publicación"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/spls.html:4
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/spls.html:9
+msgid "Product lines"
+msgstr "Líneas de producto"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/spls.html:10
+msgid ""
+"Each line is a Software Product Line, a variability model over "
+"marketplace features. Pick one and configure your own product."
+msgstr ""
+"Cada línea es una Línea de Producto Software, un modelo de variabilidad "
+"sobre las features del marketplace. Elige una y configura tu propio "
+"producto."
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/spls.html:31
+msgid "Configure this line"
+msgstr "Configurar esta línea"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/spls.html:40
+msgid "Always included"
+msgstr "Siempre incluidas"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/spls.html:55
+msgid "choose exactly one"
+msgstr "elige una y solo una"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/spls.html:69
+msgid "Optional"
+msgstr "Opcionales"
+
+#: src/splent_io/splent_feature_marketplace/templates/marketplace/spls.html:84
+msgid "No product lines in the index yet."
+msgstr "Todavía no hay líneas de producto en el índice."
+
