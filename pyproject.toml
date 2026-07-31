@@ -56,3 +56,11 @@ templates = ["marketplace/detail.html", "marketplace/index.html", "marketplace/p
 models    = []
 hooks     = []
 routes    = false
+
+# ── Configuration ─────────────────────────────────────────────────────────
+[tool.splent.config]
+# The published index this browses. A fork, or a private line, points here
+# at its own.
+SPLENT_INDEX_URL = "https://splent-io.github.io/splent_index/index.json"
+# How long a fetched index is served from memory before being fetched again.
+SPLENT_INDEX_TTL_SECONDS = 60
